@@ -6,7 +6,7 @@ import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 import {IERC1155} from "../interfaces/IERC1155.sol";
 import {IERC721} from "../interfaces/IERC721.sol";
 
-contract AuctionHouse {
+contract AuctionHouseFacet {
     LibAppStorage.Layout internal l;
     LibAppStorage.Auction internal al;
     event BidSubmitted(uint256 bidAmount);
