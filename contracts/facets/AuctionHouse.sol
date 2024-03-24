@@ -109,7 +109,7 @@ contract AuctionHouse {
 
         uint totalFee = (10 * _bidAmount) / 100;
         uint totalbidFee = (90 * _bidAmount) / 100;
-        uint256 randDoa = (20 * totalFee) / 100;
+        uint256 randDoa = (10 * totalFee) / 100;
         uint256 lastAUCUser = (10 * totalFee) / 100;
         uint highestBidderCompensation = (30 * totalFee) / 100;
         uint teamProfit = (20 * totalFee) / 100;
