@@ -10,7 +10,7 @@ import "../contracts/facets/AUCFacet.sol";
 import "../contracts/facets/AuctionHouseFacet.sol";
 
 import "../contracts/MyToken.sol";
-import "../contracts/MyERC1155.sol";
+// import "../contracts/MyERC1155.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
@@ -30,7 +30,7 @@ contract DiamondDeployer is Test, IDiamondCut {
     address A = address(0xa);
     address B = address(0xb);
 
-    StakingFacet boundStaking;
+    AuctionHouseFacet boundAuctionHouse;
 
     function setUp() public {
         //deploy facets
@@ -83,7 +83,9 @@ contract DiamondDeployer is Test, IDiamondCut {
         IDiamondCut(address(diamond)).diamondCut(cut, address(0x0), "");
 
         //set rewardToken
-        diamond.setRewardToken(address(wow));
+        diamond.setRewardToken(address(nft));
+        diamond.setRewardToken(address(erc1155));
+
         A = mkaddr("staker a");
         B = mkaddr("staker b");
 
