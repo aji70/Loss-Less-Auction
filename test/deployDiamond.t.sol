@@ -10,7 +10,7 @@ import "../contracts/facets/AUCFacet.sol";
 import "../contracts/facets/AuctionHouseFacet.sol";
 
 import "../contracts/MyToken.sol";
-// import "../contracts/MyERC1155.sol";
+import "../contracts/MyERC1155.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
@@ -30,7 +30,7 @@ contract DiamondDeployer is Test, IDiamondCut {
     address A = address(0xa);
     address B = address(0xb);
 
-    AuctionHouseFacet boundAuctionHouse;
+    AuctionHouseFacet boundAuction;
 
     function setUp() public {
         //deploy facets
@@ -83,8 +83,8 @@ contract DiamondDeployer is Test, IDiamondCut {
         IDiamondCut(address(diamond)).diamondCut(cut, address(0x0), "");
 
         //set rewardToken
-        diamond.setRewardToken(address(nft));
-        diamond.setRewardToken(address(erc1155));
+        // diamond.setRewardToken(address(nft));
+        // diamond.setRewardToken(address(erc1155));
 
         A = mkaddr("staker a");
         B = mkaddr("staker b");
@@ -92,13 +92,22 @@ contract DiamondDeployer is Test, IDiamondCut {
         //mint test tokens
         AUCFacet(address(diamond)).mintTo(A);
         AUCFacet(address(diamond)).mintTo(B);
+        MyToken(address(diamond)).safeMint(A);
 
         boundAuction = AuctionHouseFacet(address(diamond));
     }
 
     function testStaking() public {
         switchSigner(A);
-        boundAuction.create721Auction(50_000_000e18);
+        // boundAuction.create721Auction(
+        //     1,
+        //     50_000_000e18,
+        //     60,
+        //     block.timestamp,
+        //     address(nft)
+        // );
+
+        boundAuction.getAllAuctions();
 
         // vm.warp(3154e7);
         // boundAuction.checkRewards(A);

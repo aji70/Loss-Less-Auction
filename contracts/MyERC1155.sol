@@ -2,15 +2,22 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+// import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+// import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
-contract MyERC1155 is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
-    constructor(address initialOwner) ERC1155("") Ownable(initialOwner) {}
+contract MyERC1155 is ERC1155 {
+    address DIAMOND;
 
-    function setURI(string memory newuri) public onlyOwner {
+    // constructor(address initialOwner) ERC1155("") Ownable(initialOwner) {}
+
+    constructor(address _diamond) ERC1155("") {
+        DIAMOND = _diamond;
+    }
+
+    function setURI(string memory newuri) public {
         _setURI(newuri);
     }
 
@@ -19,7 +26,7 @@ contract MyERC1155 is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
         uint256 id,
         uint256 amount,
         bytes memory data
-    ) public onlyOwner {
+    ) public {
         _mint(account, id, amount, data);
     }
 
@@ -28,7 +35,7 @@ contract MyERC1155 is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) public onlyOwner {
+    ) public {
         _mintBatch(to, ids, amounts, data);
     }
 
@@ -39,7 +46,7 @@ contract MyERC1155 is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply {
         address to,
         uint256[] memory ids,
         uint256[] memory values
-    ) internal override(ERC1155, ERC1155Supply) {
+    ) internal override(ERC1155) {
         super._update(from, to, ids, values);
     }
 }
