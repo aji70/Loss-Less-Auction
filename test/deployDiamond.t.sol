@@ -149,7 +149,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         // switchSigner(C);
         boundingAUC.approve(address(this), 60_000_000e18);
 
-        boundAuction.bid(B, 1, 100_000_000e18, RD, LAU);
+        boundAuction.bid(B, 1, 90_000_000e18, RD, LAU);
 
         switchSigner(C);
         // boundingAUC.approve(address(this), 50_000_000e18);
@@ -160,7 +160,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         // switchSigner(C);
         boundingAUC.approve(address(this), 60_000_000e18);
 
-        boundAuction.bid(C, 1, 100_000_000e18, RD, LAU);
+        boundAuction.bid(C, 1, 10_000_000e18, RD, LAU);
 
         boundAuction.getParticularAuction(1);
     }

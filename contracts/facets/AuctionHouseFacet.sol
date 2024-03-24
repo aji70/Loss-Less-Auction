@@ -33,7 +33,7 @@ contract AuctionHouseFacet {
         uint burnAmount = (20 * totalFee) / 100;
 
         require(_auctionId > 0, "Auction ID must be greater than zero");
-        LibAppStorage.Auction memory auctionedItem = l.auctions[_auctionId];
+        LibAppStorage.Auction storage auctionedItem = l.auctions[_auctionId];
 
         if (
             auctionedItem.currentHighestBider != address(0) &&
@@ -178,17 +178,22 @@ contract AuctionHouseFacet {
         l.auctionId++;
     }
 
-    function closeAuction(uint256 auctionId) public {
+    function closeAuction(address from, uint256 auctionId) public {
         // Get the auction from storage
         LibAppStorage.Auction storage auctionedItem = l.auctions[auctionId];
         require(
-            auctionedItem.seller == msg.sender,
+            auctionedItem.seller == from,
             "Cannot end another person's Auction"
         );
 
         auctionedItem.ended = true;
 
         if (auctionedItem.tokenType == 1) {
+            LibAppStorage._transferFrom(
+                address(this),
+                auctionedItem.currentHighestBider,
+                auctionedItem.tokenId
+            );
             LibAppStorage._transferFrom(
                 address(this),
                 auctionedItem.currentHighestBider,
