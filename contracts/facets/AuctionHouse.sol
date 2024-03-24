@@ -315,19 +315,18 @@ contract AuctionHouse {
         }
     }
 
-    // function getAllAuctions(
-    //     uint256 auctionId
-    // ) public returns (LibAppStorage.Auction[] memory) {
-    //     // LibAppStorage.Auction storage auctionedItem = l.auctionarray;
-    //     LibAppStorage.Auction storage auctionedItem = l.auctionarray;
-    //     return (auctionedItem);
-    // }
-
     function getParticularAuction(
         uint256 auctionId
     ) public view returns (LibAppStorage.Auction memory) {
-        // LibAppStorage.Auction storage auctionedItem = l.auctionarray;
         LibAppStorage.Auction storage auctionedItem = l.auctions[auctionId];
         return (auctionedItem);
+    }
+
+    function getAllAuctions()
+        public
+        view
+        returns (LibAppStorage.Auction[] memory)
+    {
+        return (l.auctionarray);
     }
 }
