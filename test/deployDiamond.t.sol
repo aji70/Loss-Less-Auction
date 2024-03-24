@@ -9,7 +9,8 @@ import "../contracts/facets/OwnershipFacet.sol";
 import "../contracts/facets/AUCFacet.sol";
 import "../contracts/facets/AuctionHouseFacet.sol";
 
-import "../contracts/WOWToken.sol";
+import "../contracts/MyToken.sol";
+import "../contracts/MyERC1155.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
@@ -21,9 +22,10 @@ contract DiamondDeployer is Test, IDiamondCut {
     DiamondCutFacet dCutFacet;
     DiamondLoupeFacet dLoupe;
     OwnershipFacet ownerF;
-    ERC20Facet erc20Facet;
-    StakingFacet sFacet;
-    WOWToken wow;
+    AUCFacet aucFacet;
+    AuctionHouseFacet ahFacet;
+    MyToken nft;
+    MyERC1155 erc1155;
 
     address A = address(0xa);
     address B = address(0xb);
@@ -36,9 +38,10 @@ contract DiamondDeployer is Test, IDiamondCut {
         diamond = new Diamond(address(this), address(dCutFacet));
         dLoupe = new DiamondLoupeFacet();
         ownerF = new OwnershipFacet();
-        erc20Facet = new ERC20Facet();
-        sFacet = new StakingFacet();
-        wow = new WOWToken(address(diamond));
+        aucFacet = new AUCFacet();
+        ahFacet = new AuctionHouseFacet();
+        nft = new MyToken(address(diamond));
+        erc1155 = new MyERC1155(address(diamond));
 
         //upgrade diamond with facets
 
@@ -62,17 +65,17 @@ contract DiamondDeployer is Test, IDiamondCut {
         );
         cut[2] = (
             FacetCut({
-                facetAddress: address(sFacet),
+                facetAddress: address(aucFacet),
                 action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("StakingFacet")
+                functionSelectors: generateSelectors("AUCFacet")
             })
         );
 
         cut[3] = (
             FacetCut({
-                facetAddress: address(erc20Facet),
+                facetAddress: address(ahFacet),
                 action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("ERC20Facet")
+                functionSelectors: generateSelectors("AuctionHouseFacet")
             })
         );
 
@@ -85,95 +88,95 @@ contract DiamondDeployer is Test, IDiamondCut {
         B = mkaddr("staker b");
 
         //mint test tokens
-        ERC20Facet(address(diamond)).mintTo(A);
-        ERC20Facet(address(diamond)).mintTo(B);
+        AUCFacet(address(diamond)).mintTo(A);
+        AUCFacet(address(diamond)).mintTo(B);
 
-        boundStaking = StakingFacet(address(diamond));
+        boundAuction = AuctionHouseFacet(address(diamond));
     }
 
     function testStaking() public {
         switchSigner(A);
-        boundStaking.stake(50_000_000e18);
+        boundAuction.create721Auction(50_000_000e18);
 
-        vm.warp(3154e7);
-        boundStaking.checkRewards(A);
-        switchSigner(B);
+        // vm.warp(3154e7);
+        // boundAuction.checkRewards(A);
+        // switchSigner(B);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(StakingFacet.NoMoney.selector, 0)
-        );
-        boundStaking.unstake(5);
+        // vm.expectRevert(
+        //     abi.encodeWithSelector(StakingFacet.NoMoney.selector, 0)
+        // );
+        // boundAuction.getAllAuctions();
 
-        bytes32 value = vm.load(
-            address(diamond),
-            bytes32(abi.encodePacked(uint256(2)))
-        );
-        uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
-        console.log(decodevalue);
+        // bytes32 value = vm.load(
+        //     address(diamond),
+        //     bytes32(abi.encodePacked(uint256(2)))
+        // );
+        // uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
+        // console.log(decodevalue);
     }
 
-    function testLowBalance() public {
-        switchSigner(A);
-        boundStaking.stake(50_000_000e19);
+    //     function testLowBalance() public {
+    //         switchSigner(A);
+    //         boundStaking.stake(50_000_000e19);
 
-        vm.warp(3154e7);
-        boundStaking.checkRewards(A);
-        switchSigner(A);
+    //         vm.warp(3154e7);
+    //         boundStaking.checkRewards(A);
+    //         switchSigner(A);
 
-        vm.expectRevert();
-        // abi.encodeWithSelector(StakingFacet.NotEnough.selector, 0)
-        // 'Not Enough'
-        boundStaking.unstake(5);
+    //         vm.expectRevert();
+    //         // abi.encodeWithSelector(StakingFacet.NotEnough.selector, 0)
+    //         // 'Not Enough'
+    //         boundStaking.unstake(5);
 
-        bytes32 value = vm.load(
-            address(diamond),
-            bytes32(abi.encodePacked(uint256(2)))
-        );
-        uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
-        console.log(decodevalue);
-    }
+    //         bytes32 value = vm.load(
+    //             address(diamond),
+    //             bytes32(abi.encodePacked(uint256(2)))
+    //         );
+    //         uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
+    //         console.log(decodevalue);
+    //     }
 
-    function testEarlyCall() public {
-        switchSigner(A);
-        boundStaking.stake(50_000_000e18);
+    //     function testEarlyCall() public {
+    //         switchSigner(A);
+    //         boundStaking.stake(50_000_000e18);
 
-        vm.warp(2154e7);
-        boundStaking.checkRewards(A);
-        switchSigner(A);
+    //         vm.warp(2154e7);
+    //         boundStaking.checkRewards(A);
+    //         switchSigner(A);
 
-        vm.expectRevert();
-        // abi.encodeWithSelector(StakingFacet.NotEnough.selector, 0)
-        // 'Not Enough'
-        boundStaking.unstake(5);
+    //         vm.expectRevert();
+    //         // abi.encodeWithSelector(StakingFacet.NotEnough.selector, 0)
+    //         // 'Not Enough'
+    //         boundStaking.unstake(5);
 
-        bytes32 value = vm.load(
-            address(diamond),
-            bytes32(abi.encodePacked(uint256(2)))
-        );
-        uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
-        console.log(decodevalue);
-    }
+    //         bytes32 value = vm.load(
+    //             address(diamond),
+    //             bytes32(abi.encodePacked(uint256(2)))
+    //         );
+    //         uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
+    //         console.log(decodevalue);
+    //     }
 
-    // function testLayoutfacet() public {
-    //     LayoutChangerFacet l = LayoutChangerFacet(address(diamond));
-    //     // l.getLayout();
-    //     l.ChangeNameAndNo(777, "one guy");
+    //     // function testLayoutfacet() public {
+    //     //     LayoutChangerFacet l = LayoutChangerFacet(address(diamond));
+    //     //     // l.getLayout();
+    //     //     l.ChangeNameAndNo(777, "one guy");
 
-    //     //check outputs
-    //     LibAppStorage.Layout memory la = l.getLayout();
+    //     //     //check outputs
+    //     //     LibAppStorage.Layout memory la = l.getLayout();
 
-    //     assertEq(la.name, "one guy");
-    //     assertEq(la.currentNo, 777);
-    // }
+    //     //     assertEq(la.name, "one guy");
+    //     //     assertEq(la.currentNo, 777);
+    //     // }
 
-    // function testLayoutfacet2() public {
-    //     LayoutChangerFacet l = LayoutChangerFacet(address(diamond));
-    //     //check outputs
-    //     LibAppStorage.Layout memory la = l.getLayout();
+    //     // function testLayoutfacet2() public {
+    //     //     LayoutChangerFacet l = LayoutChangerFacet(address(diamond));
+    //     //     //check outputs
+    //     //     LibAppStorage.Layout memory la = l.getLayout();
 
-    //     assertEq(la.name, "one guy");
-    //     assertEq(la.currentNo, 777);
-    // }
+    //     //     assertEq(la.name, "one guy");
+    //     //     assertEq(la.currentNo, 777);
+    //     // }
 
     function generateSelectors(
         string memory _facetName
