@@ -90,6 +90,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         // //mint test tokens
         AUCFacet(address(diamond)).mintTo(A);
         AUCFacet(address(diamond)).mintTo(B);
+        AUCFacet(address(diamond)).mintTo(B);
 
         boundAuction = AuctionHouseFacet(address(diamond));
         // boundingAUC = AUCFacet(address(diamond));
@@ -100,6 +101,15 @@ contract DiamondDeployer is Test, IDiamondCut {
         nft.safeMint();
         nft.balanceOf(A);
 
+        // boundAuction.create721Auction(
+        //     block.timestamp,
+        //     20_000_000e18,
+        //     10000,
+        //     block.timestamp,
+        //     address(nft)
+        // );
+        switchSigner(B);
+        nft.safeMint();
         boundAuction.create721Auction(
             1,
             50_000_000e18,
@@ -107,23 +117,8 @@ contract DiamondDeployer is Test, IDiamondCut {
             block.timestamp,
             address(nft)
         );
+        // boundAuction.bid(1, 60_000_000e18);
         boundAuction.getAllAuctions();
-
-        // vm.warp(3154e7);
-        // boundStaking.checkRewards(A);
-        // switchSigner(B);
-
-        // vm.expectRevert(
-        //     abi.encodeWithSelector(StakingFacet.NoMoney.selector, 0)
-        // );
-        // boundStaking.unstake(5);
-
-        // bytes32 value = vm.load(
-        //     address(diamond),generateSelectors
-        //     bytes32(abi.encodePacked(uint256(2)))
-        // );
-        // uint256 decodevalue = abi.decode(abi.encodePacked(value), (uint256));
-        // console.log(decodevalue);
     }
 
     function generateSelectors(
