@@ -13,8 +13,8 @@ contract MyERC1155 is ERC1155 {
 
     // constructor(address initialOwner) ERC1155("") Ownable(initialOwner) {}
 
-    constructor(address _diamond) ERC1155("") {
-        DIAMOND = _diamond;
+    constructor() ERC1155("") {
+        DIAMOND = msg.sender;
     }
 
     function setURI(string memory newuri) public {

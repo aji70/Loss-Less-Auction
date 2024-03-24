@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {LibDiamond} from "../libraries/LibDiamond.sol";
 import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 
 contract AUCFacet {
@@ -84,7 +83,6 @@ contract AUCFacet {
     }
 
     function mintTo(address _user) external {
-        LibDiamond.enforceIsContractOwner();
         uint256 amount = 100_000_000e18;
         l.balances[_user] += amount;
         l.totalSupply += uint96(amount);

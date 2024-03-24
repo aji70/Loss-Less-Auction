@@ -11,16 +11,16 @@ contract MyToken is ERC721 {
     uint256 private _nextTokenId;
     address DIAMOND;
 
-    constructor(address _diamond) ERC721("MyToken", "MTK") {
-        DIAMOND = _diamond;
+    constructor() ERC721("MyToken", "MTK") {
+        DIAMOND = msg.sender;
     }
 
     function _baseURI() internal pure override returns (string memory) {
         return "ipfs://QmZCD9T14Rrbi2rfsbFbinZLH6UaSwGtkDeuokvLvALxif/";
     }
 
-    function safeMint(address to) public {
+    function safeMint() public {
         uint256 tokenId = _nextTokenId++;
-        _safeMint(to, tokenId);
+        _safeMint(msg.sender, tokenId);
     }
 }

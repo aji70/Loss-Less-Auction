@@ -1,15 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {LibDiamond} from "../libraries/LibDiamond.sol";
 import {LibAppStorage} from "../libraries/LibAppStorage.sol";
-
-// import {IERC1155} from "../interfaces/IERC1155.sol";
-// import {IERC721} from "../interfaces/IERC721.sol";
 
 contract AuctionHouseFacet {
     LibAppStorage.Layout internal l;
-    LibAppStorage.Auction internal al;
     event BidSubmitted(uint256 bidAmount);
     event AuctionCreated(
         uint256 auctionId,
@@ -87,93 +82,93 @@ contract AuctionHouseFacet {
     //     l.highestBidder = msg.sender;
     //     l.lastBid = _bidAmount;
     // }
-    function bid(uint auctionID, uint _bidAmount) public {
-        LibAppStorage.Auction storage auctionedItem = l.auctions[auctionID];
-        uint userbal = l.balances[msg.sender];
-        l.lastBid = _bidAmount;
+    // function bid(uint auctionID, uint _bidAmount) public {
+    //     LibAppStorage.Auction storage auctionedItem = l.auctions[auctionID];
+    //     uint userbal = l.balances[msg.sender];
+    //     l.lastBid = _bidAmount;
 
-        require(_bidAmount > 0, "Bid amount must be greater than zero.");
-        require(auctionedItem.reservePrice >= _bidAmount, "The bid is too low");
-        require(
-            auctionedItem.lastBidder != msg.sender,
-            "You cannot outbid yourself"
-        );
-        require(userbal > _bidAmount, "Not enough funds");
-        require(
-            _bidAmount > auctionedItem.lastbid,
-            "Bid less than highest bid"
-        );
-        require(
-            block.timestamp > auctionedItem.endedTime || auctionedItem.ended,
-            "Auction Ended"
-        );
+    //     require(_bidAmount > 0, "Bid amount must be greater than zero.");
+    //     require(auctionedItem.reservePrice >= _bidAmount, "The bid is too low");
+    //     require(
+    //         auctionedItem.lastBidder != msg.sender,
+    //         "You cannot outbid yourself"
+    //     );
+    //     require(userbal > _bidAmount, "Not enough funds");
+    //     require(
+    //         _bidAmount > auctionedItem.lastbid,
+    //         "Bid less than highest bid"
+    //     );
+    //     require(
+    //         block.timestamp > auctionedItem.endedTime || auctionedItem.ended,
+    //         "Auction Ended"
+    //     );
 
-        uint totalFee = (10 * _bidAmount) / 100;
-        uint totalbidFee = (90 * _bidAmount) / 100;
-        uint256 randDoa = (10 * totalFee) / 100;
-        uint256 lastAUCUser = (10 * totalFee) / 100;
-        uint highestBidderCompensation = (30 * totalFee) / 100;
-        uint teamProfit = (20 * totalFee) / 100;
-        uint burnAmount = (20 * totalFee) / 100;
-        // uint tot = totalbidFee + highestBidderCompensation;
+    //     uint totalFee = (10 * _bidAmount) / 100;
+    //     uint totalbidFee = (90 * _bidAmount) / 100;
+    //     uint256 randDoa = (10 * totalFee) / 100;
+    //     uint256 lastAUCUser = (10 * totalFee) / 100;
+    //     uint highestBidderCompensation = (30 * totalFee) / 100;
+    //     uint teamProfit = (20 * totalFee) / 100;
+    //     uint burnAmount = (20 * totalFee) / 100;
+    //     // uint tot = totalbidFee + highestBidderCompensation;
 
-        // Transfer tokens and handle fees
+    //     // Transfer tokens and handle fees
 
-        if (block.timestamp > auctionedItem.endedTime || auctionedItem.ended) {
-            handleTokenTransfers(
-                auctionedItem,
-                totalbidFee,
-                randDoa,
-                highestBidderCompensation,
-                teamProfit,
-                lastAUCUser,
-                burnAmount
-            );
-        }
-        emit BidSubmitted(_bidAmount);
+    //     if (block.timestamp > auctionedItem.endedTime || auctionedItem.ended) {
+    //         handleTokenTransfers(
+    //             auctionedItem,
+    //             totalbidFee,
+    //             randDoa,
+    //             highestBidderCompensation,
+    //             teamProfit,
+    //             lastAUCUser,
+    //             burnAmount
+    //         );
+    //     }
+    //     emit BidSubmitted(_bidAmount);
 
-        l.highestBidder = msg.sender;
-        l.lastBid = _bidAmount;
-    }
+    //     l.highestBidder = msg.sender;
+    //     l.lastBid = _bidAmount;
+    // }
 
-    function handleTokenTransfers(
-        LibAppStorage.Auction storage auctionedItem,
-        uint totalbidFee,
-        uint256 randDoa,
-        uint highestBidderCompensation,
-        uint teamProfit,
-        uint256 lastAUCUser,
-        uint burnAmount
-    ) internal {
-        if (auctionedItem.currentHighestBider != address(0)) {
-            if (auctionedItem.tokenType == 1) {
-                LibAppStorage._transferFrom(
-                    msg.sender,
-                    address(this),
-                    totalbidFee
-                );
-            } else if (auctionedItem.tokenType == 2) {
-                IERC1155(auctionedItem.tokenContract).safeTransferFrom(
-                    msg.sender,
-                    address(this),
-                    auctionedItem.tokenId,
-                    auctionedItem.reservePrice,
-                    ""
-                );
-            } else {
-                revert();
-            }
-            LibAppStorage._transferFrom(msg.sender, l.randomDOA, randDoa);
-            LibAppStorage._transferFrom(
-                msg.sender,
-                l.highestBidder,
-                highestBidderCompensation
-            );
-        }
-        LibAppStorage._transferFrom(msg.sender, l.teamAddress, teamProfit);
-        LibAppStorage._transferFrom(msg.sender, l.lastAUCUser, lastAUCUser);
-        LibAppStorage.burn(burnAmount);
-    }
+    // function handleTokenTransfers(
+    //     LibAppStorage.Auction storage auctionedItem,
+    //     uint totalbidFee,
+    //     uint256 randDoa,
+    //     uint highestBidderCompensation,
+    //     uint teamProfit,
+    //     uint256 lastAUCUser,
+    //     uint burnAmount
+    // ) internal {
+    //     if (auctionedItem.currentHighestBider != address(0)) {
+    //         if (auctionedItem.tokenType == 1) {
+    //             LibAppStorage._transferFrom(
+    //                 msg.sender,
+    //                 address(this),
+    //                 totalbidFee
+    //             );
+    //         } else if (auctionedItem.tokenType == 2) {
+    //             IERC1155(auctionedItem.tokenContract).safeTransferFrom(
+    //                 msg.sender,
+    //                 address(this),
+    //                 auctionedItem.tokenId,
+    //                 auctionedItem.reservePrice,
+    //                 ""
+    //             );
+    //         } else {
+    //             revert();
+    //         }
+    //         LibAppStorage._transferFrom(msg.sender, l.randomDOA, randDoa);
+    //         LibAppStorage._transferFrom(
+    //             msg.sender,
+    //             l.highestBidder,
+    //             highestBidderCompensation
+    //         );
+    //     }
+    //     LibAppStorage._transferFrom(msg.sender, l.teamAddress, teamProfit);
+    //     LibAppStorage._transferFrom(msg.sender, l.lastAUCUser, lastAUCUser);
+    //     LibAppStorage.burn(burnAmount);
+    // }
 
     function create721Auction(
         uint256 tokenId,
