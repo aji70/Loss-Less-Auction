@@ -26,9 +26,16 @@ contract DiamondDeployer is Test, IDiamondCut {
     AuctionHouseFacet ahFacet;
     MyToken nft;
     MyERC1155 erc1155;
+    AUCFacet au;
+    AuctionHouseFacet ah;
+    MyToken n;
 
     address A = address(0xa);
     address B = address(0xb);
+    address RD = address(0xc);
+    address TM = address(0xd);
+    address LAU = address(0xe);
+    address C = address(0xf);
 
     AuctionHouseFacet boundAuction;
     AUCFacet boundingAUC;
@@ -86,39 +93,76 @@ contract DiamondDeployer is Test, IDiamondCut {
         IDiamondCut(address(diamond)).diamondCut(cut, address(0x0), "");
         A = mkaddr("staker a");
         B = mkaddr("staker b");
+        C = mkaddr("auction c");
 
         // //mint test tokens
         AUCFacet(address(diamond)).mintTo(A);
         AUCFacet(address(diamond)).mintTo(B);
         AUCFacet(address(diamond)).mintTo(B);
+        AUCFacet(address(diamond)).mintTo(C);
 
-        boundAuction = AuctionHouseFacet(address(diamond));
+        // boundAuction = AuctionHouseFacet(address(diamond));
         // boundingAUC = AUCFacet(address(diamond));
     }
 
     function testAuction() public {
+        au = new AUCFacet();
+        ah = new AuctionHouseFacet();
+        n = new MyToken();
+        boundAuction = AuctionHouseFacet(address(diamond));
+        boundingAUC = AUCFacet(address(diamond));
         switchSigner(A);
         nft.safeMint();
         nft.balanceOf(A);
-
-        // boundAuction.create721Auction(
-        //     block.timestamp,
-        //     20_000_000e18,
-        //     10000,
-        //     block.timestamp,
-        //     address(nft)
-        // );
-        switchSigner(B);
-        nft.safeMint();
+        aucFacet.balanceOf(A);
+        // aucFacet.mintTo(address(diamond));
+        aucFacet.balanceOf(address(diamond));
+        // aucFacet.balanceOf(address(this));
+        // 0x2e234DAe75C793f67A35089C9d99245E1C58470b
         boundAuction.create721Auction(
             1,
             50_000_000e18,
-            1000000000,
+            10000,
             block.timestamp,
             address(nft)
         );
-        // boundAuction.bid(1, 60_000_000e18);
-        boundAuction.getAllAuctions();
+        // switchSigner(B);
+        // nft.safeMint();
+        // boundAuction.create721Auction(
+        //     1,
+        //     50_000_000e18,
+        //     1000000000,
+        //     block.timestamp,
+        //     address(nft)
+        // );
+        boundingAUC.approve(address(this), 60_000_000e18);
+
+        boundAuction.bid(A, 1, 80_000_000e18, RD, LAU);
+        uint256 bal = boundingAUC.balanceOf(address(diamond));
+        console.log(bal, "A balance");
+        switchSigner(B);
+        // boundingAUC.approve(address(this), 50_000_000e18);
+
+        // boundAuction.bid(B, 1, 50_000_000e18, RD, LAU);
+        // uint256 balB = boundingAUC.balanceOf(address(diamond));
+        // console.log(balB, "B balance");
+        // switchSigner(C);
+        boundingAUC.approve(address(this), 60_000_000e18);
+
+        boundAuction.bid(B, 1, 100_000_000e18, RD, LAU);
+
+        switchSigner(C);
+        // boundingAUC.approve(address(this), 50_000_000e18);
+
+        // boundAuction.bid(B, 1, 50_000_000e18, RD, LAU);
+        // uint256 balB = boundingAUC.balanceOf(address(diamond));
+        // console.log(balB, "B balance");
+        // switchSigner(C);
+        boundingAUC.approve(address(this), 60_000_000e18);
+
+        boundAuction.bid(C, 1, 100_000_000e18, RD, LAU);
+
+        boundAuction.getParticularAuction(1);
     }
 
     function generateSelectors(

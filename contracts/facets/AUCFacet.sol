@@ -33,7 +33,7 @@ contract AUCFacet {
 
     function balanceOf(address _owner) public returns (uint256 balance) {
         l.lastAUCUser = msg.sender;
-        balance = l.balances[_owner];
+        return (l.balances[_owner]);
     }
 
     function transfer(

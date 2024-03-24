@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
 library LibAppStorage {
@@ -12,8 +13,6 @@ library LibAppStorage {
         uint256 reservePrice;
         uint256 currentHighestBid;
         address currentHighestBider;
-        address lastBidder;
-        uint lastbid;
         bool started;
         bool ended;
         address auctionCreator;
@@ -44,13 +43,14 @@ library LibAppStorage {
         uint256 auctionIdCounter;
         uint256 auctionId;
         mapping(uint256 => Auction) auctions;
-        mapping(uint => address) bidders;
+        mapping(address => Bidder) bidders;
         Auction[] auctionarray;
+        address aucFacetAddress;
+        uint256 teamBalance;
     }
 
     struct Bidder {
         address bidderAddress;
-        uint256 bidAmount;
         bool isWinner;
         bool hasWithdrawn;
         bool compensated;
@@ -87,7 +87,7 @@ library LibAppStorage {
         l.balances[msg.sender] -= amount;
 
         // Update the total supply
-        l.totalSupply -= uint96(amount);
+        l.totalSupply -= uint256(amount);
 
         // Emit the Transfer event
         emit LibAppStorage.Transfer(msg.sender, address(0), amount);
